@@ -15,7 +15,7 @@ connect = pymysql.Connect(
 cursor = connect.cursor()
 
 # 起始 和 终止 AID
-startAid = 381
+startAid = 1
 endAid = 1000000
 
 # 循环请求 B站 接口
@@ -30,7 +30,7 @@ for aid in range(startAid, endAid):
                 print(r['data'])
 
                 # 数据库操作语句
-                r = cursor.executemany('insert into test values (%s, %s, %s,%s, %s, %s,%s, %s, %s,%s, %s, %s, %s)',
+                r = cursor.executemany('insert into `bilibili-data-archive` values (%s, %s, %s,%s, %s, %s,%s, %s, %s,%s, %s, %s, %s)',
                                        [(r['data']['aid'] if type(r['data']['aid']) == int else None,
                                          r['data']['view'] if type(r['data']['view']) == int else None,
                                          r['data']['danmaku'] if type(r['data']['danmaku']) == int else None,
