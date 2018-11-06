@@ -3,6 +3,7 @@ import time
 
 import pymysql.cursors
 
+# 连接数据库
 connect = pymysql.Connect(
     host='localhost',
     port=3306,
@@ -13,9 +14,11 @@ connect = pymysql.Connect(
 )
 cursor = connect.cursor()
 
+# 起始 和 终止 AID
 startAid = 381
 endAid = 1000000
 
+# 循环请求 B站 接口
 for aid in range(startAid, endAid):
     payload = {'aid': aid}
     while True:
@@ -25,6 +28,8 @@ for aid in range(startAid, endAid):
 
             if r['code'] == 0:
                 print(r['data'])
+
+                # 数据库操作语句
                 r = cursor.executemany('insert into test values (%s, %s, %s,%s, %s, %s,%s, %s, %s,%s, %s, %s, %s)',
                                        [(r['data']['aid'] if type(r['data']['aid']) == int else None,
                                          r['data']['view'] if type(r['data']['view']) == int else None,
@@ -40,6 +45,7 @@ for aid in range(startAid, endAid):
                                          r['data']['no_reprint'] if type(r['data']['no_reprint']) == int else None,
                                          r['data']['copyright'] if type(r['data']['copyright']) == int else None
                                          )])
+                # 提交语句
                 connect.commit()
             break
         except requests.exceptions.ConnectionError:
