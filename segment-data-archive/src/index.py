@@ -1,11 +1,44 @@
 import requests
 from pyquery import PyQuery as pq
 import re
-import time
+import pymysql.cursors
+
+# 连接数据库
+connect = pymysql.Connect(
+    host='localhost',
+    port=3306,
+    user='root',
+    passwd='root',
+    db='pylearn',
+    charset='utf8'
+)
+cursor = connect.cursor()
+
+
+def saveToMysql(obj):
+    r = cursor.executemany('insert into `segment-data-archive` values (%s, %s, %s,%s, %s, %s,%s, %s, %s,%s, %s, %s)',
+                           [(obj['id'],
+                             obj['url'],
+                             obj['title'],
+                             obj['auth'],
+                             obj['catalog'],
+                             obj['type'],
+                             obj['tag'],
+                             obj['hits'],
+                             obj['read'],
+                             obj['votes'],
+                             obj['collect'],
+                             obj['content']
+                             )])
+
+    # 提交语句
+    connect.commit()
+    print(obj['id'] + ":  success")
+
 
 # 起始 和 终止 AID
-startAid = 1190000016935062
-endAid = 1190000016950000
+startAid = 1190000016800000
+endAid = 1190000016900000
 
 for aid in range(startAid, endAid):
     try:
@@ -24,9 +57,9 @@ for aid in range(startAid, endAid):
             'read': re.split(" 分钟", re.split("读完需要 ", ht(".content__tech > span").text())[1])[0],
             'votes': ht("#side-widget-votes-num").text(),
             'collect': ht("#mainBookmarkNum").text(),
-            'content':ht(".article__content").text()
+            'content': ht(".article__content").text()
         }
-        print(obj)
+        saveToMysql(obj)
 
     except Exception as e:
-        print(str(aid))
+        print(str(aid) + ":  " + str(e))
