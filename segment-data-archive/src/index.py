@@ -13,6 +13,8 @@ for aid in range(startAid, endAid):
         ht = pq(r.text)
 
         obj = {
+            'id': str(aid),
+            'url': 'https://segmentfault.com/a/' + str(aid),
             'title': ht("h1#articleTitle").text(),
             'auth': ht(".article__authormeta strong").text(),
             'catalog': ht(".article__authormeta > a").eq(1).text(),
@@ -21,7 +23,8 @@ for aid in range(startAid, endAid):
             'hits': re.split(" 次阅读", ht(".content__tech > span").text())[0],
             'read': re.split(" 分钟", re.split("读完需要 ", ht(".content__tech > span").text())[1])[0],
             'votes': ht("#side-widget-votes-num").text(),
-            'collect': ht("#mainBookmarkNum").text()
+            'collect': ht("#mainBookmarkNum").text(),
+            'content':ht(".article__content").text()
         }
         print(obj)
 
