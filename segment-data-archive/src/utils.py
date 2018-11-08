@@ -3,19 +3,21 @@ from pyquery import PyQuery as pq
 import re
 import pymysql.cursors
 
-# 连接数据库
-connect = pymysql.Connect(
-    host='localhost',
-    port=3306,
-    user='root',
-    passwd='root',
-    db='pylearn',
-    charset='utf8'
-)
-cursor = connect.cursor()
+def initMysql():
+    # 连接数据库
+    connect = pymysql.Connect(
+        host='localhost',
+        port=3306,
+        user='root',
+        passwd='root',
+        db='pylearn',
+        charset='utf8'
+    )
+    return connect
 
 
-def saveToMysql(obj):
+def saveToMysql(obj, connect):
+    cursor = connect.cursor()
     r = cursor.executemany('insert into `segment-data-archive` values (%s, %s, %s,%s, %s, %s,%s, %s, %s,%s, %s, %s)',
                            [(obj['id'],
                              obj['url'],
@@ -36,11 +38,7 @@ def saveToMysql(obj):
     print(obj['id'] + ":  success")
 
 
-# 起始 和 终止 AID
-startAid = 1190000016800000
-endAid = 1190000016900000
-
-for aid in range(startAid, endAid):
+def getByAid(aid, connect):
     try:
         r = requests.get('https://segmentfault.com/a/' + str(aid), timeout=6)
         ht = pq(r.text)
@@ -59,7 +57,7 @@ for aid in range(startAid, endAid):
             'collect': ht("#mainBookmarkNum").text(),
             'content': ht(".article__content").text()
         }
-        saveToMysql(obj)
+        saveToMysql(obj, connect)
 
     except Exception as e:
         print(str(aid) + ":  " + str(e))
