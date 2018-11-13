@@ -7,3 +7,4 @@
 - python 基础语法
 - pymysql 数据库存储
 - requests 基本使用
+- PyQuery 使用 jquery 操作/分析 html文本
